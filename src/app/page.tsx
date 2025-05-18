@@ -3,7 +3,7 @@ import { ImageDxClientPage } from '@/app/features/image-dx/components/image-dx-c
 
 export const metadata: Metadata = {
   title: 'ImageDx - AI Image Diagnosis',
-  description: 'AI-powered image analysis for informational insights. Not a substitute for professional medical evaluation.',
+  description: 'AI-powered image analysis for informational insights.',
 };
 
 export default function Home() {
