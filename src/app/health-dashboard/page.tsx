@@ -1,5 +1,7 @@
 
-import type { Metadata } from 'next';
+'use client';
+
+import { useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, HeartPulse, Lightbulb, TrendingUp, Activity, Droplet, Utensils, Smile } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -7,21 +9,37 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Separator } from '@/components/ui/separator';
 import { MoodTrackerForm } from './components/mood-tracker-form';
 
-export const metadata: Metadata = {
-  title: 'Health Dashboard & Wellness - ImageDx',
-  description: 'Track your health information, log your mood, and discover wellness tips.',
-};
+// Note: Metadata is typically handled in Server Components or layout files.
+// Since this is now a Client Component, 'export const metadata' is removed.
+// If specific metadata for this page is crucial, consider adding a layout.tsx
+// in the /health-dashboard directory.
+
+// Placeholder data for wellness tips
+const allWellnessTips = [
+  { id: 1, title: 'Stay Hydrated', description: 'Drink at least 8 glasses of water a day to keep your body functioning optimally.', icon: Droplet, moods: ['happy', 'okay', 'sad', 'anxious', 'stressed', 'energetic'] },
+  { id: 2, title: 'Move Your Body Regularly', description: 'Aim for at least 30 minutes of moderate exercise most days of the week.', icon: Activity, moods: ['happy', 'okay', 'stressed', 'energetic'] },
+  { id: 3, title: 'Prioritize Quality Sleep', description: 'Strive for 7-9 hours of uninterrupted sleep each night for recovery and health.', icon: HeartPulse, moods: ['okay', 'sad', 'anxious', 'stressed'] },
+  { id: 4, title: 'Eat a Balanced Diet', description: 'Focus on whole foods, including plenty of fruits, vegetables, lean proteins, and whole grains.', icon: Utensils, moods: ['happy', 'okay', 'sad', 'anxious', 'stressed', 'energetic'] },
+  { id: 5, title: 'Practice Mindfulness', description: 'Take a few minutes each day for meditation or deep breathing to reduce stress.', icon: Lightbulb, moods: ['okay', 'sad', 'anxious', 'stressed'] },
+  { id: 6, title: 'Connect with Others', description: 'Maintain strong social connections for emotional well-being.', icon: Smile, moods: ['happy', 'okay', 'sad', 'anxious', 'energetic'] },
+];
+
 
 export default function HealthDashboardPage() {
-  // Placeholder data for wellness tips
-  const wellnessTips = [
-    { id: 1, title: 'Stay Hydrated', description: 'Drink at least 8 glasses of water a day to keep your body functioning optimally.', icon: Droplet },
-    { id: 2, title: 'Move Your Body Regularly', description: 'Aim for at least 30 minutes of moderate exercise most days of the week.', icon: Activity },
-    { id: 3, title: 'Prioritize Quality Sleep', description: 'Strive for 7-9 hours of uninterrupted sleep each night for recovery and health.', icon: HeartPulse }, // Using HeartPulse as a proxy for sleep
-    { id: 4, title: 'Eat a Balanced Diet', description: 'Focus on whole foods, including plenty of fruits, vegetables, lean proteins, and whole grains.', icon: Utensils },
-    { id: 5, title: 'Practice Mindfulness', description: 'Take a few minutes each day for meditation or deep breathing to reduce stress.', icon: Lightbulb }, // Using Lightbulb as a proxy for mindfulness
-    { id: 6, title: 'Connect with Others', description: 'Maintain strong social connections for emotional well-being.', icon: Smile },
-  ];
+  const [currentMood, setCurrentMood] = useState<string | undefined>(undefined);
+
+  const handleMoodLog = (moodValue: string) => {
+    setCurrentMood(moodValue);
+  };
+
+  const getFilteredWellnessTips = () => {
+    if (!currentMood) {
+      return allWellnessTips; // Show all tips if no mood is logged yet
+    }
+    return allWellnessTips.filter(tip => tip.moods.includes(currentMood));
+  };
+
+  const displayedWellnessTips = getFilteredWellnessTips();
 
   return (
     <div className="container mx-auto px-4 py-8 sm:py-12 flex flex-col items-center min-h-screen bg-background">
@@ -48,25 +66,19 @@ export default function HealthDashboardPage() {
       </header>
 
       <div className="w-full max-w-4xl space-y-10">
-        {/* Health Tracking Section */}
+        {/* Mood Logging Section */}
         <Card className="shadow-xl rounded-xl border-border overflow-hidden">
           <CardHeader className="bg-card pb-4">
             <CardTitle className="text-2xl flex items-center gap-3 text-primary">
-              <TrendingUp className="h-7 w-7" />
-              Health Information Tracking
+              <TrendingUp className="h-7 w-7" /> 
+              How Are You Feeling Today?
             </CardTitle>
             <CardDescription className="text-base text-foreground/70">
-              Log your daily mood using the form below. More tracking features coming soon!
+              Log your mood below. Based on how you're feeling, we'll suggest some wellness tips.
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-6 pb-8">
-            <MoodTrackerForm />
-            <div className="mt-8 p-6 text-center text-foreground/60 bg-muted/20 rounded-lg border border-dashed border-border/50">
-                <p className="text-md font-medium mb-1">More Tracking Features Coming Soon!</p>
-                <p className="text-sm">
-                Soon you'll be able to log sleep patterns, activity levels, water intake, and more.
-                </p>
-            </div>
+            <MoodTrackerForm onMoodLog={handleMoodLog} />
           </CardContent>
         </Card>
 
@@ -77,14 +89,14 @@ export default function HealthDashboardPage() {
           <CardHeader className="bg-card pb-4">
             <CardTitle className="text-2xl flex items-center gap-3 text-primary">
               <Lightbulb className="h-7 w-7" />
-              Daily Wellness Tips
+              {currentMood ? "Wellness Tips For You" : "Daily Wellness Tips"}
             </CardTitle>
             <CardDescription className="text-base text-foreground/70">
-              Inspiration and advice to help you maintain a healthy and balanced lifestyle.
+              {currentMood ? `Here are some tips that might be helpful for when you're feeling ${currentMood}:` : "Inspiration and advice to help you maintain a healthy and balanced lifestyle."}
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-6 pb-8 grid md:grid-cols-2 gap-5">
-            {wellnessTips.map((tip) => {
+            {displayedWellnessTips.length > 0 ? displayedWellnessTips.map((tip) => {
               const TipIcon = tip.icon;
               return (
                 <Card key={tip.id} className="bg-secondary/20 border-secondary shadow-sm rounded-lg hover:shadow-md transition-shadow">
@@ -99,7 +111,9 @@ export default function HealthDashboardPage() {
                   </CardContent>
                 </Card>
               );
-            })}
+            }) : (
+              <p className="text-foreground/70 md:col-span-2 text-center">No specific tips for this mood combination right now, but general wellness is always a good idea!</p>
+            )}
           </CardContent>
         </Card>
       </div>

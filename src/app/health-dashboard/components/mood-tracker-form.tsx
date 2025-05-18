@@ -35,7 +35,11 @@ const moodOptions: MoodOption[] = [
   { value: 'energetic', label: 'Energetic', icon: Zap },
 ];
 
-export function MoodTrackerForm() {
+interface MoodTrackerFormProps {
+  onMoodLog: (mood: string) => void;
+}
+
+export function MoodTrackerForm({ onMoodLog }: MoodTrackerFormProps) {
   const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(new Date());
   const [selectedMood, setSelectedMood] = React.useState<string | undefined>(undefined);
   const [notes, setNotes] = React.useState<string>('');
@@ -59,6 +63,7 @@ export function MoodTrackerForm() {
     };
 
     console.log('Mood Entry:', moodEntry); // For now, just log to console
+    onMoodLog(selectedMood); // Call the callback with the selected mood
 
     toast({
       title: 'Mood Logged!',
@@ -71,7 +76,7 @@ export function MoodTrackerForm() {
       ),
     });
 
-    // Optionally reset form fields
+    // Optionally reset form fields - user might want to see their selection
     // setSelectedMood(undefined);
     // setNotes('');
     // setSelectedDate(new Date());
