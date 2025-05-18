@@ -2,8 +2,9 @@
 'use client';
 
 import { useState, type ChangeEvent, type FormEvent, useEffect } from 'react';
+import Link from 'next/link';
 import Image from 'next/image';
-import { UploadCloud, Loader2, AlertTriangle, FileImage, Stethoscope, Info } from 'lucide-react';
+import { UploadCloud, Loader2, AlertTriangle, FileImage, Stethoscope, Info, HeartPulse } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -120,9 +121,17 @@ export function ImageDxClientPage() {
            <Stethoscope className="h-10 w-10 sm:h-12 sm:w-12 text-primary" />
            <h1 className="text-4xl sm:text-5xl font-bold text-primary tracking-tight">ImageDx</h1>
         </div>
-        <p className="text-lg sm:text-xl text-foreground/80 max-w-2xl mx-auto">
+        <p className="text-lg sm:text-xl text-foreground/80 max-w-2xl mx-auto mb-6">
           Upload an image of urine sediment for AI-powered analysis.
         </p>
+        <div>
+          <Button variant="secondary" size="lg" asChild className="rounded-full shadow-md hover:shadow-lg transition-shadow">
+            <Link href="/health-dashboard" className="flex items-center gap-2">
+              <HeartPulse className="h-5 w-5" />
+              Go to Health Dashboard & Wellness
+            </Link>
+          </Button>
+        </div>
       </header>
 
       <Card className="w-full max-w-2xl shadow-xl rounded-xl">
