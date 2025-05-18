@@ -3,15 +3,23 @@
 
 import { useState, type FormEvent } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, HeartPulse, Lightbulb, MessageSquare, Droplet, Activity, Utensils, Smile } from 'lucide-react';
+import { ArrowLeft, HeartPulse, Lightbulb, MessageSquare, Droplet, Activity, Utensils, Smile, type LucideIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 
-// Placeholder data for wellness tips
-const allWellnessTips = [
+// Define an interface for the wellness tip
+interface WellnessTip {
+  id: number;
+  title: string;
+  description: string;
+  icon: LucideIcon; // Use LucideIcon type
+}
+
+// Wellness tips array
+const allWellnessTips: WellnessTip[] = [
   { id: 1, title: 'Stay Hydrated', description: 'Drink at least 8 glasses of water a day to keep your body functioning optimally.', icon: Droplet },
   { id: 2, title: 'Move Your Body Regularly', description: 'Aim for at least 30 minutes of moderate exercise most days of the week.', icon: Activity },
   { id: 3, title: 'Prioritize Quality Sleep', description: 'Strive for 7-9 hours of uninterrupted sleep each night for recovery and health.', icon: HeartPulse },
@@ -68,7 +76,6 @@ export default function HealthDashboardPage() {
       </header>
 
       <div className="w-full max-w-4xl space-y-10">
-        {/* Health Description Section */}
         <Card className="shadow-xl rounded-xl border-border overflow-hidden">
           <CardHeader className="bg-card pb-4">
             <CardTitle className="text-2xl flex items-center gap-3 text-primary">
@@ -98,7 +105,6 @@ export default function HealthDashboardPage() {
         {showWellnessTips && (
           <>
             <Separator className="my-8" />
-            {/* Wellness Tips Section */}
             <Card className="shadow-xl rounded-xl border-border overflow-hidden">
               <CardHeader className="bg-card pb-4">
                 <CardTitle className="text-2xl flex items-center gap-3 text-primary">
