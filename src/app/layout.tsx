@@ -1,3 +1,4 @@
+
 import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
@@ -14,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'ImageDx - AI Image Analysis (Educational)',
-  description: 'AI-powered image analysis for educational insights. Not for medical diagnosis or treatment advice.',
+  title: 'ImageDx - AI Image Analysis',
+  description: 'ImageDx - AI Image Analysis.',
 };
 
 export default function RootLayout({

@@ -1,8 +1,8 @@
+
 import type { DiagnoseImageOutput } from '@/ai/flows/diagnose-image';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { AlertCircle } from 'lucide-react';
 
 // Extracts the type for a single diagnosis object from the DiagnoseImageOutput type.
 type Diagnosis = DiagnoseImageOutput['diagnoses'][0];
@@ -42,7 +42,7 @@ export function DiagnosisResultCard({ diagnosis }: DiagnosisResultCardProps) {
           </Badge>
         </div>
       </CardHeader>
-      <CardContent className="px-5 pb-2">
+      <CardContent className="px-5 pb-4 pt-2"> {/* Adjusted pb-4 here as footer is removed */}
         <div className="mb-4">
           <Progress 
             value={confidencePercentage} 
@@ -54,19 +54,6 @@ export function DiagnosisResultCard({ diagnosis }: DiagnosisResultCardProps) {
           <span className="font-medium text-foreground">Explanation:</span> {diagnosis.explanation}
         </CardDescription>
       </CardContent>
-      {diagnosis.generalTreatmentInfo && (
-        <CardFooter className="px-5 pb-5 pt-2 flex-col items-start">
-          <div className="mt-3 p-3 border-l-4 border-accent bg-accent/10 rounded-r-md w-full">
-            <h4 className="text-sm font-semibold text-accent-foreground mb-1 flex items-center">
-              <AlertCircle className="h-4 w-4 mr-2 text-accent shrink-0" />
-              General Educational Information
-            </h4>
-            <p className="text-sm text-accent-foreground/80 leading-relaxed">
-              {diagnosis.generalTreatmentInfo}
-            </p>
-          </div>
-        </CardFooter>
-      )}
     </Card>
   );
 }
