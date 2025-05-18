@@ -1,6 +1,4 @@
 
-'use client';
-
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft, HeartPulse, Lightbulb, TrendingUp } from 'lucide-react';
