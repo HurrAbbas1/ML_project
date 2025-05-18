@@ -1,0 +1,59 @@
+import type { DiagnoseImageOutput } from '@/ai/flows/diagnose-image';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import { Badge } from '@/components/ui/badge';
+
+// Extracts the type for a single diagnosis object from the DiagnoseImageOutput type.
+type Diagnosis = DiagnoseImageOutput['diagnoses'][0];
+
+interface DiagnosisResultCardProps {
+  diagnosis: Diagnosis;
+}
+
+export function DiagnosisResultCard({ diagnosis }: DiagnosisResultCardProps) {
+  const confidencePercentage = Math.round(diagnosis.confidence * 100);
+
+  let confidenceBadgeVariant: "default" | "secondary" | "destructive" | "outline" = "secondary";
+  let confidenceBadgeTextClass = "";
+
+  if (confidencePercentage >= 75) {
+    confidenceBadgeVariant = "default"; // Uses primary color
+  } else if (confidencePercentage < 40) {
+    confidenceBadgeVariant = "destructive";
+  } else {
+    confidenceBadgeVariant = "secondary"; // Mid-range confidence
+  }
+  
+  // Ensure contrast for badge text if needed, though default variants usually handle this
+  if (confidenceBadgeVariant === "default" || confidenceBadgeVariant === "destructive") {
+    confidenceBadgeTextClass = "text-primary-foreground"; // Or specific destructive-foreground
+  }
+
+
+  return (
+    <Card className="mb-4 shadow-lg rounded-lg overflow-hidden bg-card">
+      <CardHeader className="pb-3 pt-5 px-5">
+        <div className="flex justify-between items-center gap-3">
+          <CardTitle className="text-xl font-semibold text-primary flex-grow break-words">
+            {diagnosis.condition}
+          </CardTitle>
+          <Badge variant={confidenceBadgeVariant} className={`ml-2 text-sm py-1 px-3 shrink-0 ${confidenceBadgeTextClass}`}>
+            {confidencePercentage}% Confidence
+          </Badge>
+        </div>
+      </CardHeader>
+      <CardContent className="px-5 pb-5">
+        <div className="mb-4">
+          <Progress 
+            value={confidencePercentage} 
+            aria-label={`${confidencePercentage}% confidence for ${diagnosis.condition}`} 
+            className="h-3 rounded-full [&>div]:bg-primary" 
+          />
+        </div>
+        <CardDescription className="text-base text-foreground/90 leading-relaxed">
+          {diagnosis.explanation}
+        </CardDescription>
+      </CardContent>
+    </Card>
+  );
+}
