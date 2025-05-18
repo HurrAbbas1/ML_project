@@ -3,7 +3,8 @@
 
 import { useState, type FormEvent } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, HeartPulse, Lightbulb, MessageSquare, Droplet, Activity, Utensils, Smile, type LucideIcon } from 'lucide-react';
+import { ArrowLeft, HeartPulse, Lightbulb, MessageSquare, Droplet, Activity, Utensils, Smile } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react'; // Keep type for potential future use, though not used in data now
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -15,17 +16,17 @@ interface WellnessTip {
   id: number;
   title: string;
   description: string;
-  icon: LucideIcon; // Use LucideIcon type
+  // icon: LucideIcon; // Temporarily removed for debugging
 }
 
-// Wellness tips array
+// Wellness tips array (icons temporarily removed from data)
 const allWellnessTips: WellnessTip[] = [
-  { id: 1, title: 'Stay Hydrated', description: 'Drink at least 8 glasses of water a day to keep your body functioning optimally.', icon: Droplet },
-  { id: 2, title: 'Move Your Body Regularly', description: 'Aim for at least 30 minutes of moderate exercise most days of the week.', icon: Activity },
-  { id: 3, title: 'Prioritize Quality Sleep', description: 'Strive for 7-9 hours of uninterrupted sleep each night for recovery and health.', icon: HeartPulse },
-  { id: 4, title: 'Eat a Balanced Diet', description: 'Focus on whole foods, including plenty of fruits, vegetables, lean proteins, and whole grains.', icon: Utensils },
-  { id: 5, title: 'Practice Mindfulness', description: 'Take a few minutes each day for meditation or deep breathing to reduce stress.', icon: Lightbulb },
-  { id: 6, title: 'Connect with Others', description: 'Maintain strong social connections for emotional well-being.', icon: Smile },
+  { id: 1, title: 'Stay Hydrated', description: 'Drink at least 8 glasses of water a day to keep your body functioning optimally.'},
+  { id: 2, title: 'Move Your Body Regularly', description: 'Aim for at least 30 minutes of moderate exercise most days of the week.'},
+  { id: 3, title: 'Prioritize Quality Sleep', description: 'Strive for 7-9 hours of uninterrupted sleep each night for recovery and health.'},
+  { id: 4, title: 'Eat a Balanced Diet', description: 'Focus on whole foods, including plenty of fruits, vegetables, lean proteins, and whole grains.'},
+  { id: 5, title: 'Practice Mindfulness', description: 'Take a few minutes each day for meditation or deep breathing to reduce stress.'},
+  { id: 6, title: 'Connect with Others', description: 'Maintain strong social connections for emotional well-being.'},
 ];
 
 
@@ -108,7 +109,7 @@ export default function HealthDashboardPage() {
             <Card className="shadow-xl rounded-xl border-border overflow-hidden">
               <CardHeader className="bg-card pb-4">
                 <CardTitle className="text-2xl flex items-center gap-3 text-primary">
-                  <Lightbulb className="h-7 w-7" />
+                  <Lightbulb className="h-7 w-7" /> {/* Keep an icon for the section title */}
                   Daily Wellness Tips
                 </CardTitle>
                 <CardDescription className="text-base text-foreground/70">
@@ -117,12 +118,12 @@ export default function HealthDashboardPage() {
               </CardHeader>
               <CardContent className="pt-6 pb-8 grid md:grid-cols-2 gap-5">
                 {allWellnessTips.map((tip) => {
-                  const TipIcon = tip.icon;
+                  // const TipIcon = tip.icon; // Temporarily removed
                   return (
                     <Card key={tip.id} className="bg-secondary/20 border-secondary shadow-sm rounded-lg hover:shadow-md transition-shadow">
                       <CardHeader className="pb-2 pt-4 px-5">
                          <div className="flex items-center gap-3">
-                            <TipIcon className="h-6 w-6 text-accent" />
+                            {/* <TipIcon className="h-6 w-6 text-accent" />  // Temporarily removed */}
                             <CardTitle className="text-lg text-accent font-semibold">{tip.title}</CardTitle>
                          </div>
                       </CardHeader>
