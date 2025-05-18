@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: 'ImageDx - AI Image Diagnosis',
-  description: 'Upload an image of urine sediment for AI-powered disease diagnosis.',
+  description: 'AI-powered image analysis for informational insights. Not a substitute for professional medical evaluation.',
 };
 
 export default function RootLayout({

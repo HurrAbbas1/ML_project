@@ -120,7 +120,7 @@ export function ImageDxClientPage() {
            <h1 className="text-4xl sm:text-5xl font-bold text-primary tracking-tight">ImageDx</h1>
         </div>
         <p className="text-lg sm:text-xl text-foreground/80 max-w-xl mx-auto">
-          Upload an image of urine sediment for AI-powered diagnosis. This tool provides preliminary insights and is not a substitute for professional medical advice.
+          Upload an image of urine sediment for AI-powered analysis. <strong>IMPORTANT:</strong> This tool offers preliminary insights for informational purposes only. <strong>It is not a replacement for evaluation by a qualified healthcare professional and should not be used to make medical decisions.</strong> Always seek the advice of your doctor or other qualified health provider regarding any medical condition.
         </p>
       </header>
 
@@ -209,7 +209,7 @@ export function ImageDxClientPage() {
                 <AlertTitle className="text-2xl text-foreground/80">No Conditions Identified</AlertTitle>
                 <AlertDescription className="mt-2 text-base">
                     The AI analysis did not identify any specific conditions based on the provided image.
-                    This does not guarantee the absence of issues. Always consult a qualified medical professional for a comprehensive evaluation and diagnosis.
+                    This does not guarantee the absence of issues. <strong>Remember, this tool is not a substitute for professional medical diagnosis or treatment.</strong> Always consult a qualified medical professional for a comprehensive evaluation.
                 </AlertDescription>
              </Alert>
         </section>
