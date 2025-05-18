@@ -1,25 +1,26 @@
 
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowLeft, HeartPulse, Lightbulb, TrendingUp } from 'lucide-react';
+import { ArrowLeft, HeartPulse, Lightbulb, TrendingUp, Activity, Droplet, Utensils } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { MoodTrackerForm } from './components/mood-tracker-form';
 
 export const metadata: Metadata = {
   title: 'Health Dashboard & Wellness - ImageDx',
-  description: 'Track your health information and discover wellness tips.',
+  description: 'Track your health information, log your mood, and discover wellness tips.',
 };
 
 export default function HealthDashboardPage() {
   // Placeholder data for wellness tips
   const wellnessTips = [
-    { id: 1, title: 'Stay Hydrated', description: 'Drink at least 8 glasses of water a day to keep your body functioning optimally.' },
-    { id: 2, title: 'Move Your Body Regularly', description: 'Aim for at least 30 minutes of moderate exercise most days of the week.' },
-    { id: 3, title: 'Prioritize Quality Sleep', description: 'Strive for 7-9 hours of uninterrupted sleep each night for recovery and health.' },
-    { id: 4, title: 'Eat a Balanced Diet', description: 'Focus on whole foods, including plenty of fruits, vegetables, lean proteins, and whole grains.' },
-    { id: 5, title: 'Practice Mindfulness', description: 'Take a few minutes each day for meditation or deep breathing to reduce stress.' },
-    { id: 6, title: 'Connect with Others', description: 'Maintain strong social connections for emotional well-being.' },
+    { id: 1, title: 'Stay Hydrated', description: 'Drink at least 8 glasses of water a day to keep your body functioning optimally.', icon: Droplet },
+    { id: 2, title: 'Move Your Body Regularly', description: 'Aim for at least 30 minutes of moderate exercise most days of the week.', icon: Activity },
+    { id: 3, title: 'Prioritize Quality Sleep', description: 'Strive for 7-9 hours of uninterrupted sleep each night for recovery and health.', icon: HeartPulse }, // Using HeartPulse as a proxy for sleep
+    { id: 4, title: 'Eat a Balanced Diet', description: 'Focus on whole foods, including plenty of fruits, vegetables, lean proteins, and whole grains.', icon: Utensils },
+    { id: 5, title: 'Practice Mindfulness', description: 'Take a few minutes each day for meditation or deep breathing to reduce stress.', icon: Lightbulb }, // Using Lightbulb as a proxy for mindfulness
+    { id: 6, title: 'Connect with Others', description: 'Maintain strong social connections for emotional well-being.', icon: Smile }, // Placeholder for a 'Connect' icon
   ];
 
   return (
@@ -42,7 +43,7 @@ export default function HealthDashboardPage() {
           </div>
         </div>
         <p className="text-lg sm:text-xl text-foreground/80 max-w-2xl mx-auto text-center">
-          Your personal space to track health metrics and find daily wellness inspiration.
+          Your personal space to track health metrics, log your mood, and find daily wellness inspiration.
         </p>
       </header>
 
@@ -55,15 +56,16 @@ export default function HealthDashboardPage() {
               Health Information Tracking
             </CardTitle>
             <CardDescription className="text-base text-foreground/70">
-              Log and monitor your key health metrics over time. (This feature is currently under development)
+              Log your daily mood and other key health metrics over time. More tracking features coming soon!
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-6 pb-8">
-            <div className="p-8 text-center text-foreground/70 bg-muted/30 rounded-lg border border-dashed border-border">
-              <p className="text-xl font-medium mb-2">Coming Soon!</p>
-              <p className="text-base">
-                You'll soon be able to log important health data such as mood, sleep patterns, activity levels, water intake, and more.
-              </p>
+            <MoodTrackerForm />
+            <div className="mt-8 p-6 text-center text-foreground/60 bg-muted/20 rounded-lg border border-dashed border-border/50">
+                <p className="text-md font-medium mb-1">More Tracking Features Coming Soon!</p>
+                <p className="text-sm">
+                Soon you'll be able to log sleep patterns, activity levels, water intake, and more.
+                </p>
             </div>
           </CardContent>
         </Card>
@@ -81,24 +83,30 @@ export default function HealthDashboardPage() {
               Inspiration and advice to help you maintain a healthy and balanced lifestyle.
             </CardDescription>
           </CardHeader>
-          <CardContent className="pt-6 pb-8 space-y-5">
-            {wellnessTips.map((tip) => (
-              <Card key={tip.id} className="bg-secondary/20 border-secondary shadow-sm rounded-lg hover:shadow-md transition-shadow">
-                <CardHeader className="pb-2 pt-4 px-5">
-                  <CardTitle className="text-lg text-accent font-semibold">{tip.title}</CardTitle>
-                </CardHeader>
-                <CardContent className="pb-4 px-5">
-                  <p className="text-foreground/90 text-sm leading-relaxed">{tip.description}</p>
-                </CardContent>
-              </Card>
-            ))}
+          <CardContent className="pt-6 pb-8 grid md:grid-cols-2 gap-5">
+            {wellnessTips.map((tip) => {
+              const TipIcon = tip.icon;
+              return (
+                <Card key={tip.id} className="bg-secondary/20 border-secondary shadow-sm rounded-lg hover:shadow-md transition-shadow">
+                  <CardHeader className="pb-2 pt-4 px-5">
+                     <div className="flex items-center gap-3">
+                        <TipIcon className="h-6 w-6 text-accent" />
+                        <CardTitle className="text-lg text-accent font-semibold">{tip.title}</CardTitle>
+                     </div>
+                  </CardHeader>
+                  <CardContent className="pb-4 px-5">
+                    <p className="text-foreground/90 text-sm leading-relaxed">{tip.description}</p>
+                  </CardContent>
+                </Card>
+              );
+            })}
           </CardContent>
         </Card>
       </div>
 
       <footer className="mt-16 text-center text-muted-foreground text-sm">
         <p>&copy; {new Date().getFullYear()} ImageDx. All rights reserved.</p>
-        <p>This dashboard is for informational purposes only.</p>
+        <p>This dashboard is for informational purposes only and not a substitute for professional medical advice.</p>
       </footer>
     </div>
   );
