@@ -2,7 +2,7 @@
 
 import { useState, type ChangeEvent, type FormEvent, useEffect } from 'react';
 import Image from 'next/image';
-import { UploadCloud, Loader2, AlertTriangle, FileImage, Stethoscope, Info } from 'lucide-react';
+import { UploadCloud, Loader2, AlertTriangle, FileImage, Stethoscope, Info, ShieldAlert } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -57,7 +57,7 @@ export function ImageDxClientPage() {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!file || !imagePreview) {
-      setError('Please select an image file to diagnose.');
+      setError('Please select an image file to analyze.');
       return;
     }
 
@@ -72,19 +72,19 @@ export function ImageDxClientPage() {
         setError(fullError);
         toast({
           variant: 'destructive',
-          title: 'Diagnosis Failed',
+          title: 'Analysis Failed',
           description: fullError,
         });
       } else {
         setDiagnosisResult(result);
         if (result.diagnoses.length === 0) {
             toast({
-                title: 'Diagnosis Complete',
+                title: 'Analysis Complete',
                 description: 'No specific conditions identified based on the image.',
             });
         } else {
             toast({
-                title: 'Diagnosis Successful',
+                title: 'Analysis Successful',
                 description: 'Potential conditions identified. Please review the results.',
             });
         }
@@ -119,10 +119,19 @@ export function ImageDxClientPage() {
            <Stethoscope className="h-10 w-10 sm:h-12 sm:w-12 text-primary" />
            <h1 className="text-4xl sm:text-5xl font-bold text-primary tracking-tight">ImageDx</h1>
         </div>
-        <p className="text-lg sm:text-xl text-foreground/80 max-w-xl mx-auto">
-          Upload an image of urine sediment for AI-powered analysis. This tool offers preliminary insights for informational purposes.
+        <p className="text-lg sm:text-xl text-foreground/80 max-w-2xl mx-auto">
+          Upload an image of urine sediment for AI-powered analysis. Get preliminary insights and general educational information.
         </p>
       </header>
+
+      <Alert variant="destructive" className="mb-8 max-w-2xl w-full bg-destructive/10 border-destructive/30 text-destructive">
+        <ShieldAlert className="h-6 w-6 text-destructive" />
+        <AlertTitle className="font-semibold text-destructive">Important Disclaimer</AlertTitle>
+        <AlertDescription className="text-destructive/90">
+          This tool provides AI-generated information for educational purposes only. It is NOT a substitute for professional medical advice, diagnosis, or treatment. ALWAYS consult with a qualified healthcare professional for any health concerns or before making any decisions related to your health or treatment. Do not disregard professional medical advice or delay seeking it because of something you have read or seen from this application.
+        </AlertDescription>
+      </Alert>
+
 
       <Card className="w-full max-w-2xl shadow-xl rounded-xl">
         <form onSubmit={handleSubmit}>
@@ -176,12 +185,12 @@ export function ImageDxClientPage() {
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Diagnosing... Please Wait
+                  Analyzing... Please Wait
                 </>
               ) : (
                 <>
                   <FileImage className="mr-2 h-5 w-5" />
-                  Diagnose Image
+                  Analyze Image
                 </>
               )}
             </Button>
@@ -191,7 +200,7 @@ export function ImageDxClientPage() {
 
       {diagnosisResult && diagnosisResult.diagnoses.length > 0 && (
         <section className="mt-12 w-full max-w-2xl">
-          <h2 className="text-3xl font-semibold mb-8 text-center text-primary">Diagnosis Results</h2>
+          <h2 className="text-3xl font-semibold mb-8 text-center text-primary">Analysis Results</h2>
           <div className="space-y-6">
             {diagnosisResult.diagnoses
                 .sort((a, b) => b.confidence - a.confidence)
@@ -209,7 +218,7 @@ export function ImageDxClientPage() {
                 <AlertTitle className="text-2xl text-foreground/80">No Conditions Identified</AlertTitle>
                 <AlertDescription className="mt-2 text-base">
                     The AI analysis did not identify any specific conditions based on the provided image.
-                    This does not guarantee the absence of issues. Consult a qualified medical professional for a comprehensive evaluation if you have concerns.
+                    This does not guarantee the absence of issues. Remember, this tool is for educational purposes only and not a substitute for professional medical advice. Consult a qualified medical professional for a comprehensive evaluation if you have concerns.
                 </AlertDescription>
              </Alert>
         </section>

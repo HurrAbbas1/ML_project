@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'ImageDx - AI Image Diagnosis',
-  description: 'AI-powered image analysis for informational insights.',
+  title: 'ImageDx - AI Image Analysis (Educational)',
+  description: 'AI-powered image analysis for educational insights. Not for medical diagnosis or treatment advice.',
 };
 
 export default function RootLayout({
