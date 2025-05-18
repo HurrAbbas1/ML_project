@@ -1,7 +1,7 @@
 
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowLeft, HeartPulse, Lightbulb, TrendingUp, Activity, Droplet, Utensils } from 'lucide-react';
+import { ArrowLeft, HeartPulse, Lightbulb, TrendingUp, Activity, Droplet, Utensils, Smile } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -20,7 +20,7 @@ export default function HealthDashboardPage() {
     { id: 3, title: 'Prioritize Quality Sleep', description: 'Strive for 7-9 hours of uninterrupted sleep each night for recovery and health.', icon: HeartPulse }, // Using HeartPulse as a proxy for sleep
     { id: 4, title: 'Eat a Balanced Diet', description: 'Focus on whole foods, including plenty of fruits, vegetables, lean proteins, and whole grains.', icon: Utensils },
     { id: 5, title: 'Practice Mindfulness', description: 'Take a few minutes each day for meditation or deep breathing to reduce stress.', icon: Lightbulb }, // Using Lightbulb as a proxy for mindfulness
-    { id: 6, title: 'Connect with Others', description: 'Maintain strong social connections for emotional well-being.', icon: Smile }, // Placeholder for a 'Connect' icon
+    { id: 6, title: 'Connect with Others', description: 'Maintain strong social connections for emotional well-being.', icon: Smile },
   ];
 
   return (
@@ -56,7 +56,7 @@ export default function HealthDashboardPage() {
               Health Information Tracking
             </CardTitle>
             <CardDescription className="text-base text-foreground/70">
-              Log your daily mood and other key health metrics over time. More tracking features coming soon!
+              Log your daily mood using the form below. More tracking features coming soon!
             </CardDescription>
           </CardHeader>
           <CardContent className="pt-6 pb-8">
