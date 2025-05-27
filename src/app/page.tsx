@@ -1,12 +1,12 @@
 
 import type { Metadata } from 'next';
-import { ImageDxClientPage } from '@/app/features/image-dx/components/image-dx-client-page';
+import { ProjectInfoPage } from '@/app/components/project-info-page';
 
 export const metadata: Metadata = {
-  title: 'ImageDx - AI Image Analysis Tool',
-  description: 'Upload images for AI-powered analysis.',
+  title: 'Project Information - AI Urine Sediment Analysis',
+  description: 'Overview of the AI-Powered Urine Sediment Analysis Project, team members, and goals.',
 };
 
 export default function Home() {
-  return <ImageDxClientPage />;
+  return <ProjectInfoPage />;
 }

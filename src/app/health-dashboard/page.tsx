@@ -8,18 +8,16 @@ import type { LucideIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { MoodTrackerForm, type Mood } from './components/mood-tracker-form'; // Adjusted import
+import { MoodTrackerForm, type Mood } from './components/mood-tracker-form'; 
 
-// Define an interface for the wellness tip
 interface WellnessTip {
   id: number;
   title: string;
   description: string;
   icon: LucideIcon;
-  moods: Mood[]; // Moods this tip is relevant for
+  moods: Mood[]; 
 }
 
-// Wellness tips array with associated moods
 const allWellnessTips: WellnessTip[] = [
   { id: 1, title: 'Stay Hydrated', description: 'Drink at least 8 glasses of water a day to keep your body functioning optimally.', icon: Droplet, moods: ["happy", "okay", "sad", "anxious", "stressed", "energetic"] },
   { id: 2, title: 'Move Your Body Regularly', description: 'Aim for at least 30 minutes of moderate exercise. Even a short walk can boost your mood.', icon: Activity, moods: ["happy", "okay", "sad", "anxious", "stressed", "energetic"] },
@@ -44,7 +42,7 @@ export default function HealthDashboardPage() {
     setCurrentMood(mood);
     if (mood) {
       const filteredTips = allWellnessTips.filter(tip => tip.moods.includes(mood));
-      setRelevantTips(filteredTips.length > 0 ? filteredTips : allWellnessTips.slice(0, 3)); // Show some tips if filter is empty
+      setRelevantTips(filteredTips.length > 0 ? filteredTips : allWellnessTips.slice(0, 3)); 
       setWellnessTipsTitle(`Wellness Tips for Feeling ${mood.charAt(0).toUpperCase() + mood.slice(1)}`);
     } else {
       setRelevantTips(allWellnessTips);
@@ -52,7 +50,6 @@ export default function HealthDashboardPage() {
     }
   };
 
-  // Effect to set initial tips when component mounts or if mood is cleared
   useEffect(() => {
     if (!currentMood) {
       setRelevantTips(allWellnessTips);
@@ -67,7 +64,7 @@ export default function HealthDashboardPage() {
         <div className="relative flex justify-center items-center mb-6">
           <div className="absolute left-0">
             <Button variant="outline" size="lg" asChild className="rounded-lg shadow hover:shadow-md transition-shadow">
-              <Link href="/" className="flex items-center">
+              <Link href="/image-analysis" className="flex items-center">
                 <ArrowLeft className="mr-2 h-5 w-5" />
                 Back to Analysis
               </Link>

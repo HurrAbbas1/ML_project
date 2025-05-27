@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'ImageDx - AI Image Analysis',
-  description: 'ImageDx - AI Image Analysis.',
+  title: 'AI-Powered Urine Sediment Analysis Project',
+  description: 'A project leveraging AI for the analysis of urine sediment images.',
 };
 
 export default function RootLayout({
