@@ -4,7 +4,7 @@
 import { useState, type ChangeEvent, type FormEvent, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { UploadCloud, Loader2, AlertTriangle, FileImage, Microscope, Info, HeartPulse } from 'lucide-react'; // Changed Stethoscope to Microscope
+import { UploadCloud, Loader2, AlertTriangle, FileImage, Microscope, Info, HeartPulse } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -13,13 +13,15 @@ import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import type { ClassifyParticlesOutput } from '@/ai/flows/classify-particles-flow'; // Updated import
-import { processParticleClassification } from '@/app/actions'; // Updated import
+import type { ClassifyParticlesOutput } from '@/ai/flows/classify-particles-flow';
+import { processParticleClassification } from '@/app/actions';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
-// Simplified display for a single classified particle
+type Particle = ClassifyParticlesOutput['classifiedParticles'][0];
+
+// Simplified display for a single classified particle in the list
 interface ClassifiedParticleDisplayProps {
-  particle: ClassifyParticlesOutput['classifiedParticles'][0];
+  particle: Particle;
 }
 
 function ClassifiedParticleDisplay({ particle }: ClassifiedParticleDisplayProps) {
@@ -50,6 +52,11 @@ function ClassifiedParticleDisplay({ particle }: ClassifiedParticleDisplayProps)
           aria-label={`${confidencePercentage}% confidence for ${particle.particleType}`} 
           className="h-3 rounded-full [&>div]:bg-primary" 
         />
+        {particle.boundingBox && (
+            <p className="text-xs text-muted-foreground mt-2">
+                Bounding Box: x: {particle.boundingBox.x.toFixed(2)}, y: {particle.boundingBox.y.toFixed(2)}, w: {particle.boundingBox.width.toFixed(2)}, h: {particle.boundingBox.height.toFixed(2)}
+            </p>
+        )}
       </CardContent>
     </Card>
   );
@@ -59,17 +66,20 @@ function ClassifiedParticleDisplay({ particle }: ClassifiedParticleDisplayProps)
 export function ImageDxClientPage() {
   const [file, setFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [classificationResult, setClassificationResult] = useState<ClassifyParticlesOutput | null>(null); // Renamed
+  const [classificationResult, setClassificationResult] = useState<ClassifyParticlesOutput | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
+  const PREVIEW_WIDTH = 500;
+  const PREVIEW_HEIGHT = 300;
+
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     setError(null);
-    setClassificationResult(null); // Reset previous results
+    setClassificationResult(null);
     const selectedFile = event.target.files?.[0];
     if (selectedFile) {
-      if (selectedFile.size > 4 * 1024 * 1024) { // Limit file size to 4MB
+      if (selectedFile.size > 4 * 1024 * 1024) {
         setError('File size exceeds 4MB limit. Please choose a smaller file.');
         setImagePreview(null);
         setFile(null);
@@ -107,26 +117,26 @@ export function ImageDxClientPage() {
     setClassificationResult(null);
 
     try {
-      const result = await processParticleClassification(imagePreview); // Updated function call
+      const result = await processParticleClassification(imagePreview);
       if ('error' in result) {
         const fullError = result.error + (result.details ? ` (Details: ${result.details})` : '');
         setError(fullError);
         toast({
           variant: 'destructive',
-          title: 'Classification Failed', // Updated toast title
+          title: 'Classification Failed',
           description: fullError,
         });
       } else {
         setClassificationResult(result);
-        if (result.classifiedParticles.length === 0) { // Updated check
+        if (result.classifiedParticles.length === 0) {
             toast({
-                title: 'Classification Complete', // Updated toast title
-                description: 'No specific particles identified based on the image.', // Updated message
+                title: 'Classification Complete',
+                description: 'No specific particles identified based on the image.',
             });
         } else {
             toast({
-                title: 'Classification Successful', // Updated toast title
-                description: 'Particles identified. Please review the results.', // Updated message
+                title: 'Classification Successful',
+                description: 'Particles identified. Please review the results.',
             });
         }
       }
@@ -199,16 +209,43 @@ export function ImageDxClientPage() {
 
             {imagePreview && (
               <div className="mt-4 border border-dashed border-border p-4 rounded-lg bg-background shadow-inner">
-                <p className="text-sm font-medium mb-2 text-foreground/90">Image Preview:</p>
+                <p className="text-sm font-medium mb-2 text-foreground/90">Annotated Image Preview:</p>
                 <div className="flex justify-center">
-                <Image
-                  src={imagePreview}
-                  alt="Uploaded image preview"
-                  width={500}
-                  height={300}
-                  className="rounded-md object-contain max-h-[300px] w-auto border border-muted"
-                  data-ai-hint="microscopy sample"
-                />
+                  <div 
+                    className="relative" 
+                    style={{ width: PREVIEW_WIDTH, height: PREVIEW_HEIGHT }}
+                  >
+                    <Image
+                      src={imagePreview}
+                      alt="Uploaded image preview"
+                      fill
+                      className="rounded-md object-contain border border-muted"
+                      data-ai-hint="microscopy sample"
+                    />
+                    {classificationResult && classificationResult.classifiedParticles && (
+                      <>
+                        {classificationResult.classifiedParticles.map((particle, index) =>
+                          particle.boundingBox ? (
+                            <div
+                              key={`bbox-${index}`}
+                              className="absolute border-2 border-red-500 pointer-events-none"
+                              style={{
+                                left: `${particle.boundingBox.x * 100}%`,
+                                top: `${particle.boundingBox.y * 100}%`,
+                                width: `${particle.boundingBox.width * 100}%`,
+                                height: `${particle.boundingBox.height * 100}%`,
+                                boxSizing: 'border-box',
+                              }}
+                            >
+                              <span className="absolute -top-5 left-0 text-xs bg-red-500 text-white p-0.5 rounded-sm whitespace-nowrap">
+                                {particle.particleType}
+                              </span>
+                            </div>
+                          ) : null
+                        )}
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
@@ -240,12 +277,12 @@ export function ImageDxClientPage() {
 
       {classificationResult && classificationResult.classifiedParticles.length > 0 && (
         <section className="mt-12 w-full max-w-2xl">
-          <h2 className="text-3xl font-semibold mb-8 text-center text-primary">Classification Results</h2>
+          <h2 className="text-3xl font-semibold mb-8 text-center text-primary">Classification List</h2>
           <div className="space-y-6">
             {classificationResult.classifiedParticles
-                .sort((a, b) => b.confidence - a.confidence) // Sort by confidence
+                .sort((a, b) => b.confidence - a.confidence)
                 .map((particle, index) => (
-                    <ClassifiedParticleDisplay key={index} particle={particle} />
+                    <ClassifiedParticleDisplay key={`list-${index}`} particle={particle} />
             ))}
           </div>
         </section>
@@ -269,3 +306,4 @@ export function ImageDxClientPage() {
     </div>
   );
 }
+
