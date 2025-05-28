@@ -1,11 +1,11 @@
 
 'use client';
 
-import { useState, type ChangeEvent, type FormEvent, useEffect } from 'react';
+import { useState, type ChangeEvent, type FormEvent, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation'; // Import useRouter
-import { UploadCloud, Loader2, AlertTriangle, FileImage, Microscope, Info, HeartPulse, Brain, ArrowRight } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { UploadCloud, Loader2, AlertTriangle, FileImage, Microscope, Info, Brain, ArrowRight, HeartPulse } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -56,7 +56,7 @@ function ClassifiedParticleDisplay({ particle }: ClassifiedParticleDisplayProps)
         />
         {particle.boundingBox && (
             <p className="text-xs text-muted-foreground mt-2">
-                Bounding Box: x: {particle.boundingBox.x.toFixed(2)}, y: {particle.boundingBox.y.toFixed(2)}, w: {particle.boundingBox.width.toFixed(2)}, h: {particle.boundingBox.height.toFixed(2)}
+                BB: x: {particle.boundingBox.x.toFixed(2)}, y: {particle.boundingBox.y.toFixed(2)}, w: {particle.boundingBox.width.toFixed(2)}, h: {particle.boundingBox.height.toFixed(2)}
             </p>
         )}
       </CardContent>
@@ -73,19 +73,30 @@ export function ImageDxClientPage() {
   const [isClassifying, setIsClassifying] = useState(false);
   const [classificationError, setClassificationError] = useState<string | null>(null);
 
-  const { toast } = useToast();
-  const router = useRouter(); // Initialize useRouter
+  const [imageNaturalDimensions, setImageNaturalDimensions] = useState<{ width: number; height: number } | null>(null);
+  const [imageRenderConfig, setImageRenderConfig] = useState<{
+    offsetX: number;
+    offsetY: number;
+    renderedWidth: number;
+    renderedHeight: number;
+  } | null>(null);
 
-  const PREVIEW_WIDTH = 500;
-  const PREVIEW_HEIGHT = 300;
+  const { toast } = useToast();
+  const router = useRouter(); 
+  const imageRef = useRef<HTMLImageElement>(null);
+
+  const PREVIEW_CONTAINER_WIDTH = 500;
+  const PREVIEW_CONTAINER_HEIGHT = 300;
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     setClassificationError(null);
     setClassificationResult(null);
+    setImageNaturalDimensions(null); 
+    setImageRenderConfig(null); 
 
     const selectedFile = event.target.files?.[0];
     if (selectedFile) {
-      if (selectedFile.size > 4 * 1024 * 1024) { // 4MB limit
+      if (selectedFile.size > 4 * 1024 * 1024) { 
         setClassificationError('File size exceeds 4MB limit. Please choose a smaller file.');
         setImagePreview(null);
         setFile(null);
@@ -109,6 +120,40 @@ export function ImageDxClientPage() {
       setFile(null);
       setImagePreview(null);
     }
+  };
+
+  const handleImageLoad = (event: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    const img = event.currentTarget;
+    const naturalWidth = img.naturalWidth;
+    const naturalHeight = img.naturalHeight;
+
+    if (naturalWidth === 0 || naturalHeight === 0) {
+        console.error("Image natural dimensions are zero.");
+        setImageNaturalDimensions(null);
+        setImageRenderConfig(null);
+        return;
+    }
+    setImageNaturalDimensions({ width: naturalWidth, height: naturalHeight });
+
+    const containerWidth = PREVIEW_CONTAINER_WIDTH;
+    const containerHeight = PREVIEW_CONTAINER_HEIGHT;
+
+    const scaleX = containerWidth / naturalWidth;
+    const scaleY = containerHeight / naturalHeight;
+    const scale = Math.min(scaleX, scaleY);
+
+    const renderedWidth = naturalWidth * scale;
+    const renderedHeight = naturalHeight * scale;
+
+    const offsetX = (containerWidth - renderedWidth) / 2;
+    const offsetY = (containerHeight - renderedHeight) / 2;
+    
+    setImageRenderConfig({
+      offsetX,
+      offsetY,
+      renderedWidth,
+      renderedHeight,
+    });
   };
 
   const handleClassificationSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -196,7 +241,7 @@ export function ImageDxClientPage() {
           <Button variant="secondary" size="lg" asChild className="rounded-full shadow-md hover:shadow-lg transition-shadow">
             <Link href="/health-dashboard" className="flex items-center gap-2">
               <HeartPulse className="h-5 w-5" />
-              Go to Health Dashboard & Wellness
+              Go to Health Dashboard
             </Link>
           </Button>
         </div>
@@ -231,17 +276,23 @@ export function ImageDxClientPage() {
                 <p className="text-sm font-medium mb-2 text-foreground/90">Annotated Image Preview:</p>
                 <div className="flex justify-center">
                   <div 
-                    className="relative" 
-                    style={{ width: PREVIEW_WIDTH, height: PREVIEW_HEIGHT }}
+                    className="relative bg-muted/30" 
+                    style={{
+                      width: PREVIEW_CONTAINER_WIDTH,
+                      height: PREVIEW_CONTAINER_HEIGHT,
+                      overflow: 'hidden',
+                    }}
                   >
                     <Image
+                      ref={imageRef}
                       src={imagePreview}
                       alt="Uploaded image preview"
                       fill
-                      className="rounded-md object-contain border border-muted"
+                      className="object-contain"
                       data-ai-hint="microscopy sample"
+                      onLoad={handleImageLoad}
                     />
-                    {classificationResult && classificationResult.classifiedParticles && (
+                    {classificationResult && classificationResult.classifiedParticles && imageRenderConfig && (
                       <>
                         {classificationResult.classifiedParticles.map((particle, index) =>
                           particle.boundingBox ? (
@@ -249,10 +300,10 @@ export function ImageDxClientPage() {
                               key={`bbox-${index}`}
                               className="absolute border-2 border-red-500 pointer-events-none"
                               style={{
-                                left: `${particle.boundingBox.x * 100}%`,
-                                top: `${particle.boundingBox.y * 100}%`,
-                                width: `${particle.boundingBox.width * 100}%`,
-                                height: `${particle.boundingBox.height * 100}%`,
+                                left: `${particle.boundingBox.x * imageRenderConfig.renderedWidth + imageRenderConfig.offsetX}px`,
+                                top: `${particle.boundingBox.y * imageRenderConfig.renderedHeight + imageRenderConfig.offsetY}px`,
+                                width: `${particle.boundingBox.width * imageRenderConfig.renderedWidth}px`,
+                                height: `${particle.boundingBox.height * imageRenderConfig.renderedHeight}px`,
                                 boxSizing: 'border-box',
                               }}
                             >
@@ -319,7 +370,6 @@ export function ImageDxClientPage() {
         </section>
       )}
 
-      {/* Diagnosis Navigation Section */}
       {classificationResult && !classificationError && imagePreview && (
         <section className="mt-12 w-full max-w-2xl">
           <Separator className="my-8" />
@@ -348,11 +398,9 @@ export function ImageDxClientPage() {
       )}
 
       <footer className="mt-16 text-center text-muted-foreground text-sm">
-        <p>&copy; {new Date().getFullYear()} Urine Sediment Particle Classification. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} AI Urine Sediment Analysis. All rights reserved.</p>
         <p className="font-semibold">This tool is for research and educational purposes only and is NOT a substitute for professional medical advice.</p>
       </footer>
     </div>
   );
 }
-
-    
