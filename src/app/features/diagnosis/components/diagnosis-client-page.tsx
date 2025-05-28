@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import { Loader2, AlertTriangle, Brain, Microscope, ArrowLeft, Info } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { performImageDiagnosis } from '@/app/actions';
 import type { DiagnoseDiseaseOutput } from '@/ai/flows/diagnose-disease-flow';
@@ -21,6 +21,7 @@ export function DiagnosisClientPage() {
   const [isDiagnosing, setIsDiagnosing] = useState(false);
   const [diagnosisError, setDiagnosisError] = useState<string | null>(null);
   const [initialError, setInitialError] = useState<string | null>(null);
+  const [currentYear, setCurrentYear] = useState<number | null>(null);
 
   const { toast } = useToast();
   const router = useRouter();
@@ -29,6 +30,7 @@ export function DiagnosisClientPage() {
   const PREVIEW_HEIGHT = 300;
 
   useEffect(() => {
+    setCurrentYear(new Date().getFullYear());
     const storedImage = localStorage.getItem('imageForDiagnosis');
     if (storedImage) {
       setImagePreview(storedImage);
@@ -42,7 +44,7 @@ export function DiagnosisClientPage() {
         description: 'Please upload an image on the classification page before attempting diagnosis.',
       });
     }
-  }, []);
+  }, [toast]); // Added toast to dependency array as it's used inside useEffect
 
   const handleDiagnosisSubmit = async () => {
     if (!imagePreview) {
@@ -218,12 +220,12 @@ export function DiagnosisClientPage() {
         </section>
       )}
       
-      <footer className="mt-16 text-center text-muted-foreground text-sm">
-        <p>&copy; {new Date().getFullYear()} AI Urine Sediment Analysis. All rights reserved.</p>
-        <p className="font-semibold">This tool is for research and educational purposes only and is NOT a substitute for professional medical advice.</p>
-      </footer>
+      {currentYear && (
+        <footer className="mt-16 text-center text-muted-foreground text-sm">
+          <p>&copy; {currentYear} AI Urine Sediment Analysis. All rights reserved.</p>
+          <p className="font-semibold">This tool is for research and educational purposes only and is NOT a substitute for professional medical advice.</p>
+        </footer>
+      )}
     </div>
   );
 }
-
-    
