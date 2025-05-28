@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Microscope, Home, FlaskConical, Brain, HeartPulse, BarChart } from 'lucide-react';
+import { Microscope, Home, FlaskConical, Brain, HeartPulse, BarChart, BookOpen } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
@@ -17,9 +17,9 @@ const navLinks: NavLink[] = [
   { href: '/', label: 'Project Info', icon: Home },
   { href: '/image-analysis', label: 'Classification', icon: FlaskConical },
   { href: '/diagnosis', label: 'Diagnosis', icon: Brain },
+  { href: '/morphology', label: 'Morphology', icon: BookOpen },
   { href: '/health-dashboard', label: 'Dashboard', icon: BarChart },
   // Future links can be added here:
-  // { href: '/morphology', label: 'Morphology', icon: BookOpen },
   // { href: '/model-info', label: 'Model Info', icon: Info },
 ];
 
