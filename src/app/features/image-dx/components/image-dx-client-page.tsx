@@ -84,6 +84,7 @@ export function ImageDxClientPage() {
   const { toast } = useToast();
   const router = useRouter(); 
   const imageRef = useRef<HTMLImageElement>(null);
+  const imageContainerRef = useRef<HTMLDivElement>(null); // Ref for the image container
 
   const PREVIEW_CONTAINER_WIDTH = 500;
   const PREVIEW_CONTAINER_HEIGHT = 300;
@@ -126,25 +127,27 @@ export function ImageDxClientPage() {
     const img = event.currentTarget;
     const naturalWidth = img.naturalWidth;
     const naturalHeight = img.naturalHeight;
-
+  
     if (naturalWidth === 0 || naturalHeight === 0) {
-        console.error("Image natural dimensions are zero.");
-        setImageNaturalDimensions(null);
-        setImageRenderConfig(null);
-        return;
+      console.error("Image natural dimensions are zero. Cannot calculate render config.");
+      setImageNaturalDimensions(null);
+      setImageRenderConfig(null);
+      return;
     }
     setImageNaturalDimensions({ width: naturalWidth, height: naturalHeight });
-
-    const containerWidth = PREVIEW_CONTAINER_WIDTH;
-    const containerHeight = PREVIEW_CONTAINER_HEIGHT;
+  
+    // Use the actual dimensions of the container if available, otherwise fall back to constants
+    const container = imageContainerRef.current;
+    const containerWidth = container ? container.offsetWidth : PREVIEW_CONTAINER_WIDTH;
+    const containerHeight = container ? container.offsetHeight : PREVIEW_CONTAINER_HEIGHT;
 
     const scaleX = containerWidth / naturalWidth;
     const scaleY = containerHeight / naturalHeight;
     const scale = Math.min(scaleX, scaleY);
-
+  
     const renderedWidth = naturalWidth * scale;
     const renderedHeight = naturalHeight * scale;
-
+  
     const offsetX = (containerWidth - renderedWidth) / 2;
     const offsetY = (containerHeight - renderedHeight) / 2;
     
@@ -165,7 +168,7 @@ export function ImageDxClientPage() {
 
     setIsClassifying(true);
     setClassificationError(null);
-    setClassificationResult(null);
+    setClassificationResult(null); // Reset previous results
 
     try {
       const result = await processParticleClassification(imagePreview);
@@ -276,11 +279,12 @@ export function ImageDxClientPage() {
                 <p className="text-sm font-medium mb-2 text-foreground/90">Annotated Image Preview:</p>
                 <div className="flex justify-center">
                   <div 
+                    ref={imageContainerRef}
                     className="relative bg-muted/30" 
                     style={{
                       width: PREVIEW_CONTAINER_WIDTH,
                       height: PREVIEW_CONTAINER_HEIGHT,
-                      overflow: 'hidden',
+                      overflow: 'hidden', // Keep overflow hidden to clip labels if they go out
                     }}
                   >
                     <Image
@@ -300,14 +304,25 @@ export function ImageDxClientPage() {
                               key={`bbox-${index}`}
                               className="absolute border-2 border-red-500 pointer-events-none"
                               style={{
-                                left: `${particle.boundingBox.x * imageRenderConfig.renderedWidth + imageRenderConfig.offsetX}px`,
-                                top: `${particle.boundingBox.y * imageRenderConfig.renderedHeight + imageRenderConfig.offsetY}px`,
-                                width: `${particle.boundingBox.width * imageRenderConfig.renderedWidth}px`,
-                                height: `${particle.boundingBox.height * imageRenderConfig.renderedHeight}px`,
+                                left: `${Math.round(particle.boundingBox.x * imageRenderConfig.renderedWidth + imageRenderConfig.offsetX)}px`,
+                                top: `${Math.round(particle.boundingBox.y * imageRenderConfig.renderedHeight + imageRenderConfig.offsetY)}px`,
+                                width: `${Math.round(particle.boundingBox.width * imageRenderConfig.renderedWidth)}px`,
+                                height: `${Math.round(particle.boundingBox.height * imageRenderConfig.renderedHeight)}px`,
                                 boxSizing: 'border-box',
                               }}
                             >
-                              <span className="absolute -top-5 left-0 text-xs bg-red-500 text-white p-0.5 rounded-sm whitespace-nowrap">
+                              <span 
+                                className="absolute top-0 left-0 text-xs bg-red-500 text-white p-0.5 rounded-sm whitespace-nowrap"
+                                style={{ transform: 'translateY(-100%)', // Positions label just above the top border
+                                         backgroundColor: 'rgba(239, 68, 68, 0.75)', // slighly transparent red
+                                         padding: '1px 3px',
+                                         fontSize: '0.65rem',
+                                         // Ensure label doesn't overflow its own box too much
+                                         maxWidth: 'calc(100% - 2px)',
+                                         overflow: 'hidden',
+                                         textOverflow: 'ellipsis',
+                                        }}
+                              >
                                 {particle.particleType}
                               </span>
                             </div>
@@ -399,8 +414,9 @@ export function ImageDxClientPage() {
 
       <footer className="mt-16 text-center text-muted-foreground text-sm">
         <p>&copy; {new Date().getFullYear()} AI Urine Sediment Analysis. All rights reserved.</p>
-        <p className="font-semibold">This tool is for research and educational purposes only and is NOT a substitute for professional medical advice.</p>
+        <p className="font-semibold">This tool is for informational and educational purposes only and is NOT a substitute for professional medical advice, diagnosis, or treatment.</p>
       </footer>
     </div>
   );
 }
+
