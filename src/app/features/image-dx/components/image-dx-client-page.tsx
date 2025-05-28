@@ -4,7 +4,8 @@
 import { useState, type ChangeEvent, type FormEvent, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { UploadCloud, Loader2, AlertTriangle, FileImage, Microscope, Info, HeartPulse, Brain } from 'lucide-react';
+import { useRouter } from 'next/navigation'; // Import useRouter
+import { UploadCloud, Loader2, AlertTriangle, FileImage, Microscope, Info, HeartPulse, Brain, ArrowRight } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,9 +15,7 @@ import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import type { ClassifyParticlesOutput } from '@/ai/flows/classify-particles-flow';
-import { processParticleClassification, performImageDiagnosis } from '@/app/actions';
-import type { DiagnoseDiseaseOutput } from '@/ai/flows/diagnose-disease-flow';
-import { DiagnosisResultCard } from './diagnosis-result-card';
+import { processParticleClassification } from '@/app/actions';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Separator } from '@/components/ui/separator';
 
@@ -74,11 +73,8 @@ export function ImageDxClientPage() {
   const [isClassifying, setIsClassifying] = useState(false);
   const [classificationError, setClassificationError] = useState<string | null>(null);
 
-  const [diagnosisResult, setDiagnosisResult] = useState<DiagnoseDiseaseOutput | null>(null);
-  const [isDiagnosing, setIsDiagnosing] = useState(false);
-  const [diagnosisError, setDiagnosisError] = useState<string | null>(null);
-
   const { toast } = useToast();
+  const router = useRouter(); // Initialize useRouter
 
   const PREVIEW_WIDTH = 500;
   const PREVIEW_HEIGHT = 300;
@@ -86,8 +82,6 @@ export function ImageDxClientPage() {
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     setClassificationError(null);
     setClassificationResult(null);
-    setDiagnosisError(null);
-    setDiagnosisResult(null);
 
     const selectedFile = event.target.files?.[0];
     if (selectedFile) {
@@ -127,8 +121,6 @@ export function ImageDxClientPage() {
     setIsClassifying(true);
     setClassificationError(null);
     setClassificationResult(null);
-    setDiagnosisError(null);
-    setDiagnosisResult(null);
 
     try {
       const result = await processParticleClassification(imagePreview);
@@ -167,49 +159,16 @@ export function ImageDxClientPage() {
     }
   };
 
-  const handleDiagnosisSubmit = async () => {
-    if (!imagePreview) {
-      setDiagnosisError('No image available for diagnosis. Please upload and classify an image first.');
-      return;
-    }
-    setIsDiagnosing(true);
-    setDiagnosisError(null);
-    setDiagnosisResult(null);
-
-    try {
-      const result = await performImageDiagnosis(imagePreview);
-      if ('error' in result) {
-        const fullError = result.error + (result.details ? ` (Details: ${result.details})` : '');
-        setDiagnosisError(fullError);
-        toast({
-          variant: 'destructive',
-          title: 'Diagnosis Failed',
-          description: fullError,
-        });
-      } else {
-        setDiagnosisResult(result);
-         if (result.diagnoses.length === 0) {
-            toast({
-                title: 'Diagnosis Complete',
-                description: 'No specific conditions identified based on the image.',
-            });
-        } else {
-            toast({
-                title: 'Diagnosis Successful',
-                description: 'Potential conditions identified. Please review the results.',
-            });
-        }
-      }
-    } catch (e) {
-      const errorMessage = e instanceof Error ? e.message : 'An unexpected error occurred.';
-      setDiagnosisError(errorMessage);
+  const handleProceedToDiagnosis = () => {
+    if (imagePreview) {
+      localStorage.setItem('imageForDiagnosis', imagePreview);
+      router.push('/diagnosis');
+    } else {
       toast({
         variant: 'destructive',
-        title: 'Diagnosis Error',
-        description: errorMessage,
+        title: 'Image Not Found',
+        description: 'Please upload and classify an image before proceeding to diagnosis.',
       });
-    } finally {
-      setIsDiagnosing(false);
     }
   };
   
@@ -228,10 +187,10 @@ export function ImageDxClientPage() {
       <header className="mb-10 sm:mb-12 text-center">
         <div className="inline-flex items-center gap-3 mb-3">
            <Microscope className="h-10 w-10 sm:h-12 sm:w-12 text-primary" />
-           <h1 className="text-4xl sm:text-5xl font-bold text-primary tracking-tight">Particle Classification & Analysis</h1>
+           <h1 className="text-4xl sm:text-5xl font-bold text-primary tracking-tight">Particle Classification</h1>
         </div>
         <p className="text-lg sm:text-xl text-foreground/80 max-w-2xl mx-auto mb-6">
-          Upload a urine sediment image for AI-powered particle classification and preliminary diagnostic insights.
+          Upload a urine sediment image for AI-powered particle classification.
         </p>
         <div>
           <Button variant="secondary" size="lg" asChild className="rounded-full shadow-md hover:shadow-lg transition-shadow">
@@ -262,7 +221,7 @@ export function ImageDxClientPage() {
                 type="file"
                 accept="image/png, image/jpeg, image/webp, image/gif"
                 onChange={handleFileChange}
-                disabled={isClassifying || isDiagnosing}
+                disabled={isClassifying}
                 className="file:text-primary file:font-semibold file:mr-3 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-primary/10 hover:file:bg-primary/20 transition-colors cursor-pointer"
               />
             </div>
@@ -318,7 +277,7 @@ export function ImageDxClientPage() {
             )}
           </CardContent>
           <CardFooter className="flex flex-col items-stretch gap-4 p-6 bg-secondary/30 rounded-b-xl">
-            <Button type="submit" disabled={isClassifying || isDiagnosing || !file} className="w-full text-lg py-3 h-auto rounded-md">
+            <Button type="submit" disabled={isClassifying || !file} className="w-full text-lg py-3 h-auto rounded-md">
               {isClassifying ? (
                 <>
                   <Loader2 className="mr-2 h-5 w-5 animate-spin" />
@@ -360,7 +319,7 @@ export function ImageDxClientPage() {
         </section>
       )}
 
-      {/* Diagnosis Section */}
+      {/* Diagnosis Navigation Section */}
       {classificationResult && !classificationError && imagePreview && (
         <section className="mt-12 w-full max-w-2xl">
           <Separator className="my-8" />
@@ -368,62 +327,32 @@ export function ImageDxClientPage() {
             <CardHeader>
               <CardTitle className="text-2xl flex items-center gap-2 text-foreground">
                 <Brain className="h-7 w-7 text-accent" />
-                Potential Disease Diagnosis
+                Next Step: Potential Diagnosis
               </CardTitle>
               <CardDescription>
-                Based on the image analysis, here are potential conditions. This is not a medical diagnosis.
+                Proceed to the diagnosis page to get potential insights based on the image analysis.
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Button 
-                onClick={handleDiagnosisSubmit} 
-                disabled={isDiagnosing || isClassifying || !imagePreview} 
-                className="w-full text-lg py-3 h-auto rounded-md mb-6"
+                onClick={handleProceedToDiagnosis} 
+                disabled={isClassifying || !imagePreview} 
+                className="w-full text-lg py-3 h-auto rounded-md"
               >
-                {isDiagnosing ? (
-                  <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    Diagnosing... Please Wait
-                  </>
-                ) : (
-                  "Get Potential Diagnoses"
-                )}
+                Proceed to Diagnosis
+                <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
-              {diagnosisError && (
-                <Alert variant="destructive" className="mt-4">
-                  <AlertTriangle className="h-5 w-5" />
-                  <AlertTitle>Diagnosis Error</AlertTitle>
-                  <AlertDescription>{diagnosisError}</AlertDescription>
-                </Alert>
-              )}
             </CardContent>
           </Card>
-
-          {diagnosisResult && diagnosisResult.diagnoses.length > 0 && !diagnosisError && (
-            <div className="mt-8 space-y-6">
-              {diagnosisResult.diagnoses
-                .sort((a, b) => b.confidence - a.confidence)
-                .map((diag, index) => (
-                  <DiagnosisResultCard key={`diag-${index}`} diagnosis={diag} />
-              ))}
-            </div>
-          )}
-          {diagnosisResult && diagnosisResult.diagnoses.length === 0 && !isDiagnosing && !diagnosisError && (
-            <Alert className="mt-8 p-6 shadow-md rounded-lg">
-              <Info className="h-5 w-5" />
-              <AlertTitle className="text-2xl text-foreground/80">No Specific Conditions Identified</AlertTitle>
-              <AlertDescription className="mt-2 text-base">
-                  The AI diagnosis did not identify any specific conditions based on the image.
-              </AlertDescription>
-            </Alert>
-          )}
         </section>
       )}
 
       <footer className="mt-16 text-center text-muted-foreground text-sm">
-        <p>&copy; {new Date().getFullYear()} Urine Sediment Particle Classification & Analysis. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} Urine Sediment Particle Classification. All rights reserved.</p>
         <p className="font-semibold">This tool is for research and educational purposes only and is NOT a substitute for professional medical advice.</p>
       </footer>
     </div>
   );
 }
+
+    
