@@ -4,30 +4,69 @@
 import { useState, type ChangeEvent, type FormEvent, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { UploadCloud, Loader2, AlertTriangle, FileImage, Stethoscope, Info, HeartPulse } from 'lucide-react';
+import { UploadCloud, Loader2, AlertTriangle, FileImage, Microscope, Info, HeartPulse } from 'lucide-react'; // Changed Stethoscope to Microscope
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
+import { Progress } from '@/components/ui/progress';
+import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import type { DiagnoseImageOutput } from '@/ai/flows/diagnose-image';
-import { processImageDiagnosis } from '@/app/actions';
-import { DiagnosisResultCard } from './diagnosis-result-card';
+import type { ClassifyParticlesOutput } from '@/ai/flows/classify-particles-flow'; // Updated import
+import { processParticleClassification } from '@/app/actions'; // Updated import
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+
+// Simplified display for a single classified particle
+interface ClassifiedParticleDisplayProps {
+  particle: ClassifyParticlesOutput['classifiedParticles'][0];
+}
+
+function ClassifiedParticleDisplay({ particle }: ClassifiedParticleDisplayProps) {
+  const confidencePercentage = Math.round(particle.confidence * 100);
+  let confidenceBadgeVariant: "default" | "secondary" | "destructive" | "outline" = "secondary";
+  
+  if (confidencePercentage >= 75) {
+    confidenceBadgeVariant = "default"; 
+  } else if (confidencePercentage < 40) {
+    confidenceBadgeVariant = "destructive";
+  }
+
+  return (
+    <Card className="mb-4 shadow-lg rounded-lg overflow-hidden bg-card">
+      <CardHeader className="pb-3 pt-5 px-5">
+        <div className="flex justify-between items-start gap-3">
+          <CardTitle className="text-xl font-semibold text-primary flex-grow break-words">
+            {particle.particleType}
+          </CardTitle>
+          <Badge variant={confidenceBadgeVariant} className={`ml-2 text-sm py-1 px-3 shrink-0 ${confidenceBadgeVariant === "default" || confidenceBadgeVariant === "destructive" ? "text-primary-foreground": ""}`}>
+            {confidencePercentage}% Confidence
+          </Badge>
+        </div>
+      </CardHeader>
+      <CardContent className="px-5 pb-4 pt-2">
+        <Progress 
+          value={confidencePercentage} 
+          aria-label={`${confidencePercentage}% confidence for ${particle.particleType}`} 
+          className="h-3 rounded-full [&>div]:bg-primary" 
+        />
+      </CardContent>
+    </Card>
+  );
+}
 
 
 export function ImageDxClientPage() {
   const [file, setFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [diagnosisResult, setDiagnosisResult] = useState<DiagnoseImageOutput | null>(null);
+  const [classificationResult, setClassificationResult] = useState<ClassifyParticlesOutput | null>(null); // Renamed
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     setError(null);
-    setDiagnosisResult(null);
+    setClassificationResult(null); // Reset previous results
     const selectedFile = event.target.files?.[0];
     if (selectedFile) {
       if (selectedFile.size > 4 * 1024 * 1024) { // Limit file size to 4MB
@@ -59,35 +98,35 @@ export function ImageDxClientPage() {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!file || !imagePreview) {
-      setError('Please select an image file to analyze.');
+      setError('Please select an image file to classify.');
       return;
     }
 
     setIsLoading(true);
     setError(null);
-    setDiagnosisResult(null);
+    setClassificationResult(null);
 
     try {
-      const result = await processImageDiagnosis(imagePreview);
+      const result = await processParticleClassification(imagePreview); // Updated function call
       if ('error' in result) {
         const fullError = result.error + (result.details ? ` (Details: ${result.details})` : '');
         setError(fullError);
         toast({
           variant: 'destructive',
-          title: 'Analysis Failed',
+          title: 'Classification Failed', // Updated toast title
           description: fullError,
         });
       } else {
-        setDiagnosisResult(result);
-        if (result.diagnoses.length === 0) {
+        setClassificationResult(result);
+        if (result.classifiedParticles.length === 0) { // Updated check
             toast({
-                title: 'Analysis Complete',
-                description: 'No specific conditions identified based on the image.',
+                title: 'Classification Complete', // Updated toast title
+                description: 'No specific particles identified based on the image.', // Updated message
             });
         } else {
             toast({
-                title: 'Analysis Successful',
-                description: 'Potential conditions identified. Please review the results.',
+                title: 'Classification Successful', // Updated toast title
+                description: 'Particles identified. Please review the results.', // Updated message
             });
         }
       }
@@ -118,11 +157,11 @@ export function ImageDxClientPage() {
     <div className="container mx-auto px-4 py-8 sm:py-12 flex flex-col items-center min-h-screen">
       <header className="mb-10 sm:mb-12 text-center">
         <div className="inline-flex items-center gap-3 mb-3">
-           <Stethoscope className="h-10 w-10 sm:h-12 sm:w-12 text-primary" />
-           <h1 className="text-4xl sm:text-5xl font-bold text-primary tracking-tight">ImageDx</h1>
+           <Microscope className="h-10 w-10 sm:h-12 sm:w-12 text-primary" />
+           <h1 className="text-4xl sm:text-5xl font-bold text-primary tracking-tight">Particle Classification</h1>
         </div>
         <p className="text-lg sm:text-xl text-foreground/80 max-w-2xl mx-auto mb-6">
-          Upload an image of urine sediment for AI-powered analysis.
+          Upload an image of urine sediment for AI-powered particle classification.
         </p>
         <div>
           <Button variant="secondary" size="lg" asChild className="rounded-full shadow-md hover:shadow-lg transition-shadow">
@@ -139,7 +178,7 @@ export function ImageDxClientPage() {
           <CardHeader className="pt-6">
             <CardTitle className="text-2xl flex items-center gap-2 text-foreground">
               <UploadCloud className="h-7 w-7 text-accent" />
-              Upload Image for Analysis
+              Upload Image for Classification
             </CardTitle>
             <CardDescription className="text-base">
               Select an image file (PNG, JPG, WEBP, GIF). Max 4MB.
@@ -168,7 +207,7 @@ export function ImageDxClientPage() {
                   width={500}
                   height={300}
                   className="rounded-md object-contain max-h-[300px] w-auto border border-muted"
-                  data-ai-hint="medical sample"
+                  data-ai-hint="microscopy sample"
                 />
                 </div>
               </div>
@@ -186,12 +225,12 @@ export function ImageDxClientPage() {
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Analyzing... Please Wait
+                  Classifying... Please Wait
                 </>
               ) : (
                 <>
                   <FileImage className="mr-2 h-5 w-5" />
-                  Analyze Image
+                  Classify Image
                 </>
               )}
             </Button>
@@ -199,30 +238,34 @@ export function ImageDxClientPage() {
         </form>
       </Card>
 
-      {diagnosisResult && diagnosisResult.diagnoses.length > 0 && (
+      {classificationResult && classificationResult.classifiedParticles.length > 0 && (
         <section className="mt-12 w-full max-w-2xl">
-          <h2 className="text-3xl font-semibold mb-8 text-center text-primary">Analysis Results</h2>
+          <h2 className="text-3xl font-semibold mb-8 text-center text-primary">Classification Results</h2>
           <div className="space-y-6">
-            {diagnosisResult.diagnoses
-                .sort((a, b) => b.confidence - a.confidence)
-                .map((diag, index) => (
-                    <DiagnosisResultCard key={index} diagnosis={diag} />
+            {classificationResult.classifiedParticles
+                .sort((a, b) => b.confidence - a.confidence) // Sort by confidence
+                .map((particle, index) => (
+                    <ClassifiedParticleDisplay key={index} particle={particle} />
             ))}
           </div>
         </section>
       )}
 
-      {diagnosisResult && diagnosisResult.diagnoses.length === 0 && !isLoading && !error && (
+      {classificationResult && classificationResult.classifiedParticles.length === 0 && !isLoading && !error && (
         <section className="mt-12 w-full max-w-2xl text-center">
              <Alert className="p-6 shadow-md rounded-lg">
                 <Info className="h-5 w-5" />
-                <AlertTitle className="text-2xl text-foreground/80">No Conditions Identified</AlertTitle>
+                <AlertTitle className="text-2xl text-foreground/80">No Particles Identified</AlertTitle>
                 <AlertDescription className="mt-2 text-base">
-                    The AI analysis did not identify any specific conditions based on the provided image.
+                    The AI classification did not identify any specific particles in the provided image.
                 </AlertDescription>
              </Alert>
         </section>
       )}
+      <footer className="mt-16 text-center text-muted-foreground text-sm">
+        <p>&copy; {new Date().getFullYear()} Urine Sediment Particle Classification. All rights reserved.</p>
+        <p className="font-semibold">This tool is for research and educational purposes only.</p>
+      </footer>
     </div>
   );
 }

@@ -1,10 +1,11 @@
+
 'use server';
 
-import { diagnoseImage, type DiagnoseImageInput, type DiagnoseImageOutput } from '@/ai/flows/diagnose-image';
+import { classifyParticles, type ClassifyParticlesInput, type ClassifyParticlesOutput } from '@/ai/flows/classify-particles-flow';
 
-export async function processImageDiagnosis(
+export async function processParticleClassification(
   photoDataUri: string
-): Promise<DiagnoseImageOutput | { error: string; details?: string }> {
+): Promise<ClassifyParticlesOutput | { error: string; details?: string }> {
   if (!photoDataUri || !photoDataUri.startsWith('data:image/')) {
     return { error: 'Invalid image data. Please upload a valid image file.' };
   }
@@ -16,17 +17,17 @@ export async function processImageDiagnosis(
   }
 
   try {
-    const input: DiagnoseImageInput = { photoDataUri };
-    const result = await diagnoseImage(input);
+    const input: ClassifyParticlesInput = { photoDataUri };
+    const result = await classifyParticles(input);
     
-    if (!result || !Array.isArray(result.diagnoses)) {
-        console.error('AI diagnosis returned invalid or missing diagnoses array:', result);
-        return { error: 'AI diagnosis failed to return expected results format.' };
+    if (!result || !Array.isArray(result.classifiedParticles)) {
+        console.error('AI classification returned invalid or missing classifiedParticles array:', result);
+        return { error: 'AI classification failed to return expected results format.' };
     }
     return result;
   } catch (e) {
-    console.error('Error processing image diagnosis:', e);
-    const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred during diagnosis.';
-    return { error: 'Failed to diagnose image.', details: errorMessage };
+    console.error('Error processing particle classification:', e);
+    const errorMessage = e instanceof Error ? e.message : 'An unknown error occurred during classification.';
+    return { error: 'Failed to classify particles in image.', details: errorMessage };
   }
 }

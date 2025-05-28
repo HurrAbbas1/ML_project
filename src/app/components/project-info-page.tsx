@@ -40,7 +40,7 @@ export function ProjectInfoPage() {
         <div className="mt-8">
           <Button size="lg" asChild className="rounded-full shadow-md hover:shadow-lg transition-shadow text-lg py-3 px-8 h-auto">
             <Link href="/image-analysis" className="flex items-center gap-2">
-              Go to Image Analysis Tool
+              Go to Particle Classification Tool 
               <ArrowRight className="h-5 w-5" />
             </Link>
           </Button>

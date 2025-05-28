@@ -66,7 +66,7 @@ export default function HealthDashboardPage() {
             <Button variant="outline" size="lg" asChild className="rounded-lg shadow hover:shadow-md transition-shadow">
               <Link href="/image-analysis" className="flex items-center">
                 <ArrowLeft className="mr-2 h-5 w-5" />
-                Back to Analysis
+                Back to Classification Tool
               </Link>
             </Button>
           </div>
