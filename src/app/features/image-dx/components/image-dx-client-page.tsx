@@ -312,16 +312,14 @@ export function ImageDxClientPage() {
                               }}
                             >
                               <span 
-                                className="absolute top-0 left-0 text-xs bg-red-500 text-white p-0.5 rounded-sm whitespace-nowrap"
-                                style={{ transform: 'translateY(-100%)', // Positions label just above the top border
-                                         backgroundColor: 'rgba(239, 68, 68, 0.75)', // slighly transparent red
-                                         padding: '1px 3px',
-                                         fontSize: '0.65rem',
-                                         // Ensure label doesn't overflow its own box too much
-                                         maxWidth: 'calc(100% - 2px)',
-                                         overflow: 'hidden',
-                                         textOverflow: 'ellipsis',
-                                        }}
+                                className="absolute top-0 left-0 text-xs bg-red-500 text-white p-0.5 rounded-sm"
+                                style={{ 
+                                  transform: 'translateY(-100%)', // Positions label just above the top border
+                                  backgroundColor: 'rgba(239, 68, 68, 0.75)', // slighly transparent red
+                                  padding: '1px 3px',
+                                  fontSize: '0.65rem',
+                                  // Removed maxWidth, overflow, textOverflow, and whitespace-nowrap to allow full name and wrapping
+                                }}
                               >
                                 {particle.particleType}
                               </span>
@@ -386,7 +384,7 @@ export function ImageDxClientPage() {
       )}
 
       {classificationResult && !classificationError && imagePreview && (
-        <section className="mt-12 w-full max-w-2xl">
+         <section className="mt-12 w-full max-w-2xl">
           <Separator className="my-8" />
           <Card className="w-full shadow-xl rounded-xl">
             <CardHeader>
@@ -414,7 +412,7 @@ export function ImageDxClientPage() {
 
       <footer className="mt-16 text-center text-muted-foreground text-sm">
         <p>&copy; {new Date().getFullYear()} AI Urine Sediment Analysis. All rights reserved.</p>
-        <p className="font-semibold">This tool is for informational and educational purposes only and is NOT a substitute for professional medical advice, diagnosis, or treatment.</p>
+        <p className="font-semibold">This tool is for research and educational purposes only and is NOT a substitute for professional medical advice.</p>
       </footer>
     </div>
   );
