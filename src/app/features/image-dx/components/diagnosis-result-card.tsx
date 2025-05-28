@@ -1,11 +1,11 @@
 
-import type { DiagnoseImageOutput } from '@/ai/flows/diagnose-image';
+import type { DiagnoseDiseaseOutput } from '@/ai/flows/diagnose-disease-flow'; // Updated import
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 
-// Extracts the type for a single diagnosis object from the DiagnoseImageOutput type.
-type Diagnosis = DiagnoseImageOutput['diagnoses'][0];
+// Extracts the type for a single diagnosis object from the DiagnoseDiseaseOutput type.
+type Diagnosis = DiagnoseDiseaseOutput['diagnoses'][0];
 
 interface DiagnosisResultCardProps {
   diagnosis: Diagnosis;
@@ -42,7 +42,7 @@ export function DiagnosisResultCard({ diagnosis }: DiagnosisResultCardProps) {
           </Badge>
         </div>
       </CardHeader>
-      <CardContent className="px-5 pb-4 pt-2"> {/* Adjusted pb-4 here as footer is removed */}
+      <CardContent className="px-5 pb-4 pt-2">
         <div className="mb-4">
           <Progress 
             value={confidencePercentage} 
