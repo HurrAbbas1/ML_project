@@ -3,24 +3,24 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Users, BookOpen, Microscope, ArrowRight, Building, University } from 'lucide-react';
+import { Users, BookOpen, Microscope, ArrowRight, University } from 'lucide-react'; // Removed Building
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { TeamMemberCard, type TeamMemberProps } from './team-member-card';
 
-const teamMembers: TeamMemberProps[] = [
-  { name: 'Dr. Jane Doe', role: 'Principal Investigator', imageUrl: 'https://placehold.co/100x100.png', dataAiHint: 'person scientist' },
-  { name: 'Dr. John Smith', role: 'Co-Principal Investigator', imageUrl: 'https://placehold.co/100x100.png', dataAiHint: 'person researcher' },
-  { name: 'Alex Lee', role: 'Lead Researcher', imageUrl: 'https://placehold.co/100x100.png', dataAiHint: 'person student' },
-  { name: 'Maria Garcia', role: 'Data Scientist', imageUrl: 'https://placehold.co/100x100.png', dataAiHint: 'person developer' },
-  { name: 'Your Name Here', role: 'Lead Developer', imageUrl: 'https://placehold.co/100x100.png', dataAiHint: 'person engineer' },
+const coreResearchTeam: TeamMemberProps[] = [
+  { name: 'Sania Akhtar', role: 'Principal Investigator', imageUrl: 'https://placehold.co/100x100.png', dataAiHint: 'person scientist' },
+  { name: 'Muhammad Hanif', role: 'Co-Principal Investigator', imageUrl: 'https://placehold.co/100x100.png', dataAiHint: 'person researcher' },
+  { name: 'Ahmar Rashid', role: 'Lead Researcher', imageUrl: 'https://placehold.co/100x100.png', dataAiHint: 'person academic' },
+  { name: 'Khursheed Aurangzeb', role: 'Researcher', imageUrl: 'https://placehold.co/100x100.png', dataAiHint: 'person professional' },
+  { name: 'Ejaz Ahmad Khan', role: 'Researcher', imageUrl: 'https://placehold.co/100x100.png', dataAiHint: 'person expert' },
+  { name: 'Hamdi Melih Saraoglu', role: 'Researcher', imageUrl: 'https://placehold.co/100x100.png', dataAiHint: 'person student' },
 ];
 
 const developerTeam: TeamMemberProps[] = [
-  { name: 'Firebase Studio User', role: 'Developer', imageUrl: 'https://placehold.co/100x100.png', dataAiHint: 'person coder' },
-  { name: 'App Prototyper AI', role: 'AI Assistant', imageUrl: 'https://placehold.co/100x100.png', dataAiHint: 'robot ai' },
+  { name: 'Hurr Abbas', role: 'Lead Developer', imageUrl: 'https://placehold.co/100x100.png', dataAiHint: 'person developer' },
 ];
 
 
@@ -63,13 +63,13 @@ export function ProjectInfoPage() {
           <CardContent className="pt-6 pb-8">
             <h3 className="text-xl font-semibold mb-4 text-foreground">Core Research Team</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-              {teamMembers.map((member) => (
+              {coreResearchTeam.map((member) => (
                 <TeamMemberCard key={member.name} {...member} />
               ))}
             </div>
             <Separator className="my-6"/>
             <h3 className="text-xl font-semibold mb-4 text-foreground">Development Team</h3>
-             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"> {/* Ensures dev team also uses grid */}
               {developerTeam.map((member) => (
                 <TeamMemberCard key={member.name} {...member} />
               ))}
@@ -121,12 +121,12 @@ export function ProjectInfoPage() {
           <CardContent className="pt-6 pb-8 space-y-6">
             <div className="flex flex-col sm:flex-row justify-around items-center gap-8">
               <div className="flex flex-col items-center">
-                <Image src="https://placehold.co/150x80.png?text=University+Logo" alt="University Logo" width={150} height={80} className="mb-2 rounded" data-ai-hint="logo university" />
-                <p className="text-lg font-semibold text-foreground">University Name</p>
+                <Image src="https://placehold.co/150x80.png" alt="Air University Logo" width={150} height={80} className="mb-2 rounded" data-ai-hint="university logo" />
+                <p className="text-lg font-semibold text-foreground">Air University</p>
               </div>
               <div className="flex flex-col items-center">
-                <Image src="https://placehold.co/150x80.png?text=Department+Logo" alt="Department Logo" width={150} height={80} className="mb-2 rounded" data-ai-hint="logo department" />
-                <p className="text-lg font-semibold text-foreground">Department of Computer Science</p>
+                <Image src="https://placehold.co/150x80.png" alt="Department Logo" width={150} height={80} className="mb-2 rounded" data-ai-hint="department logo" />
+                <p className="text-lg font-semibold text-foreground">Department of Creative Technologies</p>
               </div>
             </div>
           </CardContent>
