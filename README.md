@@ -44,19 +44,19 @@ PROBLEM STATEMENT
 
 Manual urine sediment analysis, a critical diagnostic procedure, presents several
 challenges:
- Time Intensive: It requires significant time from trained laboratory
+Time Intensive: It requires significant time from trained laboratory
 personnel.
- Subjectivity: Particle identification and quantification can vary between
+Subjectivity: Particle identification and quantification can vary between
 observers.
- Expertise Dependent: Accurate interpretation often relies on experienced
+Expertise Dependent: Accurate interpretation often relies on experienced
 microscopists, who may not always be readily available.
 These factors can lead to delays in analysis and potential inconsistencies. &quot;AI-
 Powered Urine Sediment Analysis&quot; addresses these issues by:
- Providing a platform for rapid, AI-assisted particle classification from
+Providing a platform for rapid, AI-assisted particle classification from
 uploaded images.
- Offering standardized, AI-generated insights that can complement
+Offering standardized, AI-generated insights that can complement
 traditional methods.
- Serving as an educational tool to help users visually identify and understand
+Serving as an educational tool to help users visually identify and understand
 the significance of various urine sediment components, thereby
 democratizing access to this knowledge.
 METHODOLOGY
@@ -65,76 +65,77 @@ web stack and integrates with a cloud-based generative AI model.
 
 1. System Architecture:
 
- Frontend: 
+Frontend: 
 
 Developed using Next.js (React framework) with TypeScript for
 type safety. User interface components are built with ShadCN UI and styled
 with Tailwind CSS. Lucide React is used for iconography.
- AI Integration: 
+AI Integration: 
 
 Genkit, an open-source AI framework, is utilized to interact
 with Google&#39;s Gemini, a multimodal AI model capable of processing image
 and text inputs.
- Backend Logic: 
+Backend Logic: 
 
 Next.js Server Actions are used to handle communication
 between the client-side application and the Genkit AI flows.
 
 2. Core Functionalities:
    
- Image Upload &amp; Pre-processing (Client-Side):
-o Users upload images (PNG, JPG, etc.) via a standard file input.
-o The image is converted to a base64 data URI on the client-side for
+Image Upload &amp; Pre-processing (Client-Side):
+
+Users upload images (PNG, JPG, etc.) via a standard file input.
+The image is converted to a base64 data URI on the client-side for
 transmission to the AI model.
 
- AI-Powered Particle Classification:
+AI-Powered Particle Classification:
 
-o The classifyParticlesFlow (a Genkit flow) receives the image data URI.
-o A specifically engineered prompt instructs the Gemini model to
+The classifyParticlesFlow (a Genkit flow) receives the image data URI.
+A specifically engineered prompt instructs the Gemini model to
 identify various urine sediment particles, estimate confidence for
 each identification, and provide normalized bounding box
 coordinates for detected particles.
-o The flow returns a structured JSON object (defined by a Zod schema)
+The flow returns a structured JSON object (defined by a Zod schema)
 containing the list of classified particles and their attributes.
 
- AI-Powered Diagnostic Suggestion:
+AI-Powered Diagnostic Suggestion:
 
-o The diagnoseDiseaseFlow (a Genkit flow) also receives the image
+The diagnoseDiseaseFlow (a Genkit flow) also receives the image
 data URI.
-o Its prompt guides the Gemini model to analyze the overall visual
+Its prompt guides the Gemini model to analyze the overall visual
 features of the sediment image and suggest potential
 conditions/diseases relevant to urinalysis, along with confidence
 scores and brief explanations.
-o This also returns a structured JSON output.
+This also returns a structured JSON output.
 
- Frontend Display
+Frontend Display
 
-o Classified particles are listed with their confidence scores.
-o Bounding boxes are rendered dynamically as overlays on the
+Classified particles are listed with their confidence scores.
+Bounding boxes are rendered dynamically as overlays on the
 previewed image, using the normalized coordinates provided by the
 AI, scaled to the displayed image size.
-o Diagnostic suggestions are presented clearly, often using card-based
+Diagnostic suggestions are presented clearly, often using card-based
 layouts.
 
- Morphology Information Page:
+Morphology Information Page:
 
-o Static, detailed information about different particle types is
+Static, detailed information about different particle types is
 presented in a tabbed layout for easy navigation and learning. Each
 particle section includes descriptions of features, sample images
 (placeholders), AI distinction notes, and diagnostic significance.
 
- Health Dashboard:
+Health Dashboard:
 
-o Allows users to log their mood using a form (date, mood selection,
+Allows users to log their mood using a form (date, mood selection,
 notes).
-o Displays general wellness tips, which can be filtered based on the
+Displays general wellness tips, which can be filtered based on the
 logged mood.
 
 Data Handling:
    
- Input (image data) and output (classification/diagnosis results) for AI flows
+Input (image data) and output (classification/diagnosis results) for AI flows
 are structured using Zod schemas to ensure type safety and consistency.
- Image data for diagnosis on the separate diagnosis page is temporarily
+Image data for diagnosis on the separate diagnosis page is temporarily
 passed via localStorage.
 Note: This application utilizes pre-trained generative AI models (Gemini via
 Genkit) and does not involve training or fine-tuning machine learning models
@@ -142,16 +143,16 @@ within the application itself. The &quot;intelligence&quot; comes from prompting
 foundation models.
 TOOLS AND TECHNOLOGIES
 
- Programming Languages: TypeScript
- Frontend Framework: Next.js (with React)
- UI Components: ShadCN UI
- Styling: Tailwind CSS
- Icons: Lucide React
- AI Framework: Genkit
- AI Model Provider: Google AI (specifically, the Gemini model)
- Schema Definition: Zod
- Development Environment: Node.js, npm
- Version Control: Git (implied for project development)
+Programming Languages: TypeScript
+Frontend Framework: Next.js (with React)
+UI Components: ShadCN UI
+Styling: Tailwind CSS
+Icons: Lucide React
+AI Framework: Genkit
+AI Model Provider: Google AI (specifically, the Gemini model)
+Schema Definition: Zod
+Development Environment: Node.js, npm
+Version Control: Git (implied for project development)
 
 EXPECTED OUTCOME
 
